@@ -2,8 +2,8 @@
 - name: "require Debian"
   assert:
     that:
-      - ansible_distribution == "Debian"
-    msg: "Only Debian is supported, this is {{ ansible_distribution }}"
+      - ansible_facts['distribution'] == "Debian"
+    fail_msg: "Only Debian is supported, this is {{ ansible_facts['distribution'] }}"
 
 - name: "install unattended-upgrades package"
   package:
