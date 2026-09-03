@@ -15,5 +15,4 @@ unattended_upgrades_automatic_reboot: 'true'
 # which is at 6:00 plus randomly up to 60 minutes
 unattended_upgrades_automatic_reboot_time: 'now'
 
-unattended_upgrades_mta_package: "sendmail"
-unattended_upgrades_mail_package: "mailutils"
+unattended_upgrades_enable_mailing: true

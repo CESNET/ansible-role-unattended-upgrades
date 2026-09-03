@@ -9,8 +9,13 @@ Use "--tags config" to run only config.
 Requirements
 ------------
 
-Define the root_email_address variable to contain a valid email address
-that will receive errors.
+Define the `root_email_address` variable to contain a valid email address
+that will receive notifications about errors.
+
+Role doesn't install any mail commands! When you enable mailing, programs
+providing `/usr/sbin/sendmail` and `/usr/bin/mail` must be installed and
+configured separately.
+Install e.g.: `sendmail`/`postfix` and `mailutils` or `msmtp-mta` and `bsd-mailx`.
 
 Role Variables
 --------------
@@ -25,8 +30,7 @@ unattended_upgrades_origin_patterns: |2
 - **unattended_upgrades_blacklist** - block of lines defining packages blacklisted from upgrading, default empty
 - **unattended_upgrades_automatic_reboot** - "true" or "false" (the default) whether to reboot if /var/run/reboot-required exists
 - **unattended_upgrades_automatic_reboot_time** - the time to reboot, default is "now", value is used as argument to "/sbin/shutdown -r " e.g. "+20" is in 20 minutes or "02:00" is at 2 am. It is not possible to specify a day.
-- **unattended_upgrades_mta_package** - Debian package providing Mail Transfer Agent, more specifically /usr/sbin/sendmail file, default is `sendmail`
-- **unattended_upgrades_mail_package** - Debian package providing the /usr/bin/mail file, default is `mailutils`
+- **unattended_upgrades_enable_mailing** - enables "only-on-error" mail notifications to user "root".
 
 Example Playbook
 ----------------
@@ -44,10 +48,9 @@ Example Playbook
                   "o=LP-PPA-webupd8team-java";
                   "origin=apt.postgresql.org,codename=${distro_codename}-pgdg";
         unattended_upgrades_blacklist: |2
-                  "postgresql-11";
+                  "postgresql-18";
                   "slapd";
         unattended_upgrades_automatic_reboot: "true"
         unattended_upgrades_automatic_reboot_time: '02:00'
-        unattended_upgrades_mta_package: "msmtp-mta"
-        unattended_upgrades_mail_package: "bsd-mailx"
+        unattended_upgrades_enable_mailing: true
 ```
