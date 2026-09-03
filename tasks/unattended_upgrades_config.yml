@@ -18,18 +18,6 @@
     regexp: 'APT::Periodic::Unattended-Upgrade "'
     line:   'APT::Periodic::Unattended-Upgrade "always";'
 
-- name: "set Unattended-Upgrade::Mail to root"
-  lineinfile:
-    path: /etc/apt/apt.conf.d/50unattended-upgrades
-    regexp: 'Unattended-Upgrade::Mail "'
-    line:   'Unattended-Upgrade::Mail "root";'
-
-- name: "set Unattended-Upgrade::MailOnlyOnError"
-  lineinfile:
-    path: /etc/apt/apt.conf.d/50unattended-upgrades
-    regexp: 'Unattended-Upgrade::MailOnlyOnError "'
-    line:   'Unattended-Upgrade::MailOnlyOnError "true";'
-
 - name: "set Unattended-Upgrade::Origins-Pattern"
   blockinfile:
     path: /etc/apt/apt.conf.d/50unattended-upgrades
@@ -55,14 +43,51 @@
     regexp: 'Unattended-Upgrade::Automatic-Reboot-Time "'
     line:   'Unattended-Upgrade::Automatic-Reboot-Time "{{ unattended_upgrades_automatic_reboot_time }}";'
 
-- name: "set root mail alias"
+# TODO - probably remove it once we deploy it everywhere
+- name: "remove legacy option Unattended-Upgrade::MailOnlyOnError"
   lineinfile:
-    state: present
-    path: /etc/aliases
-    create: true
-    owner: root
-    group: root
-    mode: '0644'
-    regexp: "^root:"
-    line: "root: {{ root_email_address }}"
-  notify: "run newaliases"
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    regexp: 'Unattended-Upgrade::MailOnlyOnError "'
+    state: absent
+
+- name: "configure unattended-upgrades to send emails"
+  when: unattended_upgrades_enable_mailing
+  block:
+    - name: "set Unattended-Upgrade::Mail to 'root'"
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: 'Unattended-Upgrade::Mail "'
+        line:   'Unattended-Upgrade::Mail "root";'
+
+    - name: "set Unattended-Upgrade::MailReport to 'only-on-error'"
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: 'Unattended-Upgrade::MailReport "'
+        line:   'Unattended-Upgrade::MailReport "only-on-error";'
+
+    - name: "set root mail alias"
+      lineinfile:
+        state: present
+        path: /etc/aliases
+        create: true
+        owner: root
+        group: root
+        mode: '0644'
+        regexp: "^root:"
+        line: "root: {{ root_email_address }}"
+      notify: "run newaliases"
+
+- name: "configure unattended-upgrades to not send emails"
+  when: not unattended_upgrades_enable_mailing
+  block:
+    - name: "unset Unattended-Upgrade::Mail"
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: 'Unattended-Upgrade::Mail "'
+        line:   '// Unattended-Upgrade::Mail "root";'
+
+    - name: "unset Unattended-Upgrade::MailReport"
+      lineinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        regexp: 'Unattended-Upgrade::MailReport "'
+        line:   '// Unattended-Upgrade::MailReport "only-on-error";'

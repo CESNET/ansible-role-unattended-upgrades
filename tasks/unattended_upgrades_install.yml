@@ -16,27 +16,32 @@
     remote_src: yes
     force: false
 
-# see https://www.debian.org/doc/debian-policy/ch-customized-programs.html#s-mail-transport-agents
-- name: "check existence of /usr/sbin/sendmail"
-  stat:
-    path: /usr/sbin/sendmail
-  register: p
+- name: "check existence of mail commands"
+  when: unattended_upgrades_enable_mailing
+  block:
+    # see https://www.debian.org/doc/debian-policy/ch-customized-programs.html#s-mail-transport-agents
+    - name: "check existence of /usr/sbin/sendmail"
+      stat:
+        path: /usr/sbin/sendmail
+      register: p
 
-- name: "install MTA package {{ unattended_upgrades_mta_package }}"
-  when: not p.stat.exists
-  package:
-    name: "{{ unattended_upgrades_mta_package }}"
-    state: present
+    - name: "warn if /usr/sbin/sendmail is missing"
+      ansible.builtin.assert:
+        that:
+          - p.stat.exists
+        fail_msg: "WARNING: /usr/sbin/sendmail is missing! Unattended-upgrades won't send emails until 'sendmail', 'msmtp-mta' or 'postfix' is installed!"
+      ignore_errors: true
 
-# unattended-upgrades tries first sendmail, then mail command
-# see https://github.com/mvo5/unattended-upgrades/blob/2.9/unattended-upgrade#L1508
-- name: "check existence of /usr/bin/mail"
-  stat:
-    path: /usr/bin/mail
-  register: p
+    # unattended-upgrades tries first sendmail, then mail command
+    # see https://github.com/mvo5/unattended-upgrades/blob/2.9/unattended-upgrade#L1508
+    - name: "check existence of /usr/bin/mail"
+      stat:
+        path: /usr/bin/mail
+      register: p
 
-- name: "install package {{ unattended_upgrades_mail_package }} providing the mail command"
-  when: not p.stat.exists
-  package:
-    name: "{{ unattended_upgrades_mail_package }}"
-    state: present
+    - name: "warn if /usr/bin/mail is missing"
+      ansible.builtin.assert:
+        that:
+          - p.stat.exists
+        fail_msg: "WARNING: /usr/bin/mail is missing! Unattended-upgrades won't send emails until 'mailutils' or 'bsd-mailx' is installed!"
+      ignore_errors: true
