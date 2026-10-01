@@ -3,6 +3,7 @@
     that:
       - root_email_address is defined
     msg: "Define variable root_email_address !"
+    quiet: true
 
 # see the script /usr/lib/apt/apt.systemd.daily for options
 

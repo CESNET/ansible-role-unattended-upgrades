@@ -4,6 +4,7 @@
     that:
       - ansible_facts['distribution'] == "Debian"
     fail_msg: "Only Debian is supported, this is {{ ansible_facts['distribution'] }}"
+    quiet: true
 
 - name: "install unattended-upgrades package"
   package:
@@ -30,6 +31,7 @@
         that:
           - p.stat.exists
         fail_msg: "WARNING: /usr/sbin/sendmail is missing! Unattended-upgrades won't send emails until 'sendmail', 'msmtp-mta' or 'postfix' is installed!"
+        quiet: true
       ignore_errors: true
 
     # unattended-upgrades tries first sendmail, then mail command
@@ -44,4 +46,5 @@
         that:
           - p.stat.exists
         fail_msg: "WARNING: /usr/bin/mail is missing! Unattended-upgrades won't send emails until 'mailutils' or 'bsd-mailx' is installed!"
+        quiet: true
       ignore_errors: true
