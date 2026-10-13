@@ -6,20 +6,23 @@ errors to root.
 
 Use "--tags config" to run only config.
 
-Requirements
-------------
+Mailing
+--------
 
-Define the `root_email_address` variable to contain a valid email address
-that will receive notifications about errors.
-
-Role doesn't install any mail commands! When you enable mailing, programs
+Role doesn't install any mail command or MTA! When you enable mailing, programs
 providing `/usr/sbin/sendmail` and `/usr/bin/mail` must be installed and
-configured separately.
-Install e.g.: `sendmail`/`postfix` and `mailutils` or `msmtp-mta` and `bsd-mailx`.
+configured separately.  Install e.g.: `sendmail`/`postfix` and `mailutils` 
+or `msmtp-mta` and `bsd-mailx`. You can use other cesnet roles to install 
+and configure mail transfer agents.
+
+When you set *root_email_address* this role will update `/etc/aliases`, but 
+it's optional as it should be done through MTA roles configuration.
 
 Role Variables
 --------------
 
+- **root_email_address** - optionally set root email address to set 
+  /etc/aliases for root.
 - **unattended_upgrades_origin_patterns** - block of lines defining checked repositories, the default is
 ```yaml
 unattended_upgrades_origin_patterns: |2
