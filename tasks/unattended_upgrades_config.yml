@@ -1,10 +1,3 @@
-- name: "check that variables root_email_address is defined"
-  assert:
-    that:
-      - root_email_address is defined
-    msg: "Define variable root_email_address !"
-    quiet: true
-
 # see the script /usr/lib/apt/apt.systemd.daily for options
 
 - name: "set APT::Periodic::Update-Package-Lists"
@@ -67,6 +60,7 @@
         line:   'Unattended-Upgrade::MailReport "only-on-error";'
 
     - name: "set root mail alias"
+      when: root_email_address is defined
       lineinfile:
         state: present
         path: /etc/aliases
