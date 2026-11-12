@@ -7,8 +7,11 @@
     quiet: true
 
 - name: "install unattended-upgrades package"
-  package:
-    name: unattended-upgrades
+  ansible.builtin.apt:
+    name:
+      - unattended-upgrades
+      # if not installed, then /var/log/unattended-upgrades/unattended-upgrades-shutdown.log contains complaints
+      - python3-gi
 
 - name: "enable periodic updates"
   copy:
